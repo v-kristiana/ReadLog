@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ book.title }}</title>
+</head>
+<body>
+    <a href="{% url 'book_list' %}">← Back to list</a>
+
+    <h1>{{ book.title }}</h1>
+    <p>Autors: {{ book.author }}</p>
+    <p>Gads: {{ book.year }}</p>
+    <p>ISBN: {{ book.isbn }}</p>
+
+    <p>Žanri:
+        {% for genre in book.genres.all %}
+            {{ genre.name }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    </p>
+
+    <p>{{ book.description }}</p>
+
+    {% if book.image %}
+        <img src="{{ book.image.url }}" alt="{{ book.title }}" width="150">
+    {% endif %}
+
+    <p>Vidējais vērtējums: {{ book.average_rating }}/5</p>
+
+    <h2>Recenzijas</h2>
+    {% for review in reviews %}
+        <div>
+            <strong>{{ review.user }}</strong> — {{ review.rating }}/5
+            <p>{{ review.comment }}</p>
+            <small>{{ review.created_at }}</small>
+        </div>
+    {% empty %}
+        <p>Vēl nav recenziju.</p>
+    {% endfor %}
+</body>
+</html>

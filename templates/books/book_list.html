@@ -1,0 +1,12 @@
+<form action="{% url 'search_books' %}" method="get">
+    <input type="text" name="q" placeholder="Meklēt grāmatas...">
+    <button type="submit">Meklēt</button>
+</form>
+
+{% for book in books %}
+
+    <p>
+        {{ book.title }} - {{ book.author }}
+        <a href="{% url 'book_detail' book.id %}">View</a>
+    </p>
+{% endfor %}

@@ -1,0 +1,14 @@
+<h1>Search Results for "{{ query }}"</h1>
+
+{% for book in books %}
+    <p>
+        {{ book.title }} - {{ book.author }}
+        <a href="{% url 'book_detail' book.id %}">View</a>
+    </p>
+{% empty %}
+    <P> search results for {{ query }}:</P>
+    <p>No books found matching your search.</p>
+{% endfor %}
+
+<hr>
+<a href="{% url 'book_list' %}">Back to full list</a>
