@@ -1,18 +1,16 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Login</title>
-    </head>
-    <body>
-        <h1>Login</h1>
-        <form method="post">
-            {% csrf_token %}
-            {% if form.errors %}
-                <p style="color: red;">Your username and password didn't match. Please try again.</p>
-            {% endif %}
-            {{ form.as_p }}
-            <button type="submit">Login</button>
-        </form>
-        <p>Don't have an account? <a href="{% url 'register' %}">Register here</a>.</p>
-    </body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+    <h1>Login</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% if form.errors %}
+            <p style="color: red;">Your username and password didn't match. Please try again.</p>
+        {% endif %}
+        {{ form.as_p }}
+        <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="{% url 'register' %}">Register here</a>.</p>
+{% endblock %}

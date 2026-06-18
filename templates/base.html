@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}ReadLog{% endblock %}</title>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'books:book_list' %}">Books</a>
+        <a href="{% url 'books:my_books' %}">My Books</a>
+        {% if user.is_authenticated %}
+            {% if user.is_staff or user.role == 'admin' or user.role == 'worker' %}
+                <a href="{% url 'books:book_add' %}" style="margin-left: 1rem;">Add Book</a>
+            {% endif %}
+        {% endif %}
+        <form action="{% url 'books:search_books' %}" method="get" style="display: inline; margin-left: 1rem;">
+            <input type="text" name="q" placeholder="Search books..." style="padding: 0.25rem;">
+            <button type="submit">Search</button>
+        </form>
+        {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" style="margin-left: 1rem;">Login</a>
+            <a href="{% url 'register' %}" style="margin-left: 0.5rem;">Register</a>
+        {% endif %}
+    </nav>
+    <hr>
+    {% block content %}{% endblock %}
+</body>
+</html>

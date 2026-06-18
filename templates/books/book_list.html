@@ -1,12 +1,21 @@
-<form action="{% url 'search_books' %}" method="get">
-    <input type="text" name="q" placeholder="Search books...">
-    <button type="submit">Search</button>
-</form>
+{% extends 'base.html' %}
 
-{% for book in books %}
+{% block title %}Books{% endblock %}
 
-    <p>
-        {{ book.title }} - {{ book.author }}
-        <a href="{% url 'book_detail' book.id %}">View</a>
-    </p>
-{% endfor %}
+{% block content %}
+<div class="book-list">
+    {% for book in books %}
+        <div class="book-card">
+            <a href="{% url 'books:book_detail' book.id %}">
+                {% if book.image %}
+                    <img src="{{ book.image.url }}" alt="{{ book.title }} cover" width="120" />
+                {% endif %}
+                <div>
+                    <strong>{{ book.title }}</strong><br>
+                    <span>{{ book.author }}</span>
+                </div>
+            </a>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

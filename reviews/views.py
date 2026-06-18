@@ -13,7 +13,7 @@ def add_review(request, book_id):
             review.user = request.user
             review.book = book
             review.save()
-            return redirect('book_detail', book_id=book_id)
+            return redirect('books:book_detail', book_id=book_id)
     else:
         form = ReviewForm()
     return render(request, "reviews/add_review.html", {'form': form, 'book': book})

@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ book.title }}</title>
-</head>
-<body>
-    <a href="{% url 'book_list' %}">← Back to list</a>
+{% extends 'base.html' %}
+
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block content %}
+    <a href="{% url 'books:book_list' %}">← Back to list</a>
 
     <h1>{{ book.title }}</h1>
     <p>Author: {{ book.author }}</p>
@@ -25,6 +24,25 @@
 
     <p>Average rating: {{ book.average_rating }}/5</p>
 
+    {% if user.is_authenticated %}
+        <form method="post" action="{% url 'books:toggle_favourite' book.id %}">
+            {% csrf_token %}
+            <button type="submit">
+                {% if is_favourite %}Remove from Favourites{% else %}Add to Favourites{% endif %}
+            </button>
+        </form>
+
+        <form method="post" action="{% url 'books:set_reading_status' book.id %}">
+            {% csrf_token %}
+            <select name="status">
+                <option value="planned" {% if current_status == 'planned' %}selected{% endif %}>Planned</option>
+                <option value="reading" {% if current_status == 'reading' %}selected{% endif %}>Reading</option>
+                <option value="read" {% if current_status == 'read' %}selected{% endif %}>Read</option>
+            </select>
+            <button type="submit">Set Status</button>
+        </form>
+    {% endif %}
+
     <h2>Reviews</h2>
     {% for review in reviews %}
         <div>
@@ -35,5 +53,23 @@
     {% empty %}
         <p>No reviews yet.</p>
     {% endfor %}
-</body>
-</html>
+
+    <h2>Recommended books</h2>
+    <div class="book-list">
+        {% for recommended_book in recommended_books %}
+            <div class="book-card">
+                <a href="{% url 'books:book_detail' recommended_book.id %}">
+                    {% if recommended_book.image %}
+                        <img src="{{ recommended_book.image.url }}" alt="{{ recommended_book.title }} cover" width="100" />
+                    {% endif %}
+                    <div>
+                        <strong>{{ recommended_book.title }}</strong><br>
+                        <span>{{ recommended_book.author }}</span>
+                    </div>
+                </a>
+            </div>
+        {% empty %}
+            <p>No recommendations yet.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

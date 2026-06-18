@@ -7,8 +7,8 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
-LOGIN_REDIRECT_URL = 'book_list'
-LOGOUT_REDIRECT_URL = 'book_list'
+LOGIN_REDIRECT_URL = '/books/'
+LOGOUT_REDIRECT_URL = '/books/'
 
 INSTALLED_APPS = [
     'django.contrib.admin',

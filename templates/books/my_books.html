@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}My Books{% endblock %}
+
+{% block content %}
+    <h1>My Reading List</h1>
+
+    <h2>Reading Statuses</h2>
+    {% for item in user_books %}
+        <p>
+            <strong>{{ item.book.title }}</strong> - Status: {{ item.get_status_display }}
+            <a href="{% url 'books:book_detail' item.book.id %}">View</a>
+        </p>
+    {% empty %}
+        <p>You haven't added any books to your list yet.</p>
+    {% endfor %}
+
+    <h2>My Favourites</h2>
+    {% for fav in favourites %}
+        <p>{{ fav.book.title }} <a href="{% url 'books:book_detail' fav.book.id %}">View</a></p>
+    {% empty %}
+        <p>You haven't added any favourite books yet.</p>
+    {% endfor %}
+
+    <a href="{% url 'books:book_list' %}">Back to Gallery</a>
+{% endblock %}
