@@ -1,0 +1,1 @@
+web: gunicorn readlog_project.wsgi --log-file -
