@@ -3,11 +3,13 @@
 {% block title %}{{ action }}{% endblock %}
 
 {% block content %}
-    <h1>{{ action }}</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">{{ action }}</button>
-    </form>
-    <p><a href="{% url 'books:book_list' %}">Back to books</a></p>
+    <div class="form-container">
+        <h1>{{ action }}</h1>
+        <form method="post" enctype="multipart/form-data" class="book-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="form-button">{{ action }}</button>
+        </form>
+        <p><a href="{% url 'books:book_list' %}">Back to books</a></p>
+    </div>
 {% endblock %}

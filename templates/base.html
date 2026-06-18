@@ -1,32 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
+    {% load static %}
     <title>{% block title %}ReadLog{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <nav>
-        <a href="{% url 'books:book_list' %}">Books</a>
-        {% if user.is_authenticated %}
-            <a href="{% url 'books:my_books' %}">My Books</a>
-            {% if user.is_staff or user.role == 'admin' or user.role == 'worker' %}
-                <a href="{% url 'books:book_add' %}">Add Book</a>
+    <nav class="site-nav">
+        <div class="nav-left">
+            <a class="nav-logo" href="{% url 'books:book_list' %}">
+                <img src="{% static 'images/logo.png' %}" alt="ReadLog logo">
+            </a>
+            <a class="nav-link" href="{% url 'books:book_list' %}">Books</a>
+            {% if user.is_authenticated %}
+                <a class="nav-link" href="{% url 'books:my_books' %}">My Books</a>
+                {% if user.is_staff or user.role == 'admin' or user.role == 'worker' %}
+                    <a class="nav-link" href="{% url 'books:book_add' %}">Add Book</a>
+                {% endif %}
             {% endif %}
-        {% endif %}
-        <form action="{% url 'books:search_books' %}" method="get" style="display: inline; margin-left: 1rem;">
-            <input type="text" name="q" placeholder="Search books..." style="padding: 0.25rem;">
-            <button type="submit">Search</button>
+        </div>
+
+        <form class="nav-search-form" action="{% url 'books:search_books' %}" method="get">
+            <input class="search-input" type="text" name="q" placeholder="Search books...">
+            <button class="search-button" type="submit">
+                <img src="{% static 'images/search.png' %}" alt="Search">
+            </button>
         </form>
-        {% if user.is_authenticated %}
-            <form method="post" action="{% url 'logout' %}" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit">Logout</button>
-            </form>
-        {% else %}
-            <a href="{% url 'login' %}" style="margin-left: 1rem;">Login</a>
-            <a href="{% url 'register' %}" style="margin-left: 0.5rem;">Register</a>
-        {% endif %}
+
+        <div class="nav-actions">
+            {% if user.is_authenticated %}
+                <form class="nav-action-form" method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button class="nav-action-button" type="submit">Logout</button>
+                </form>
+            {% else %}
+                <a class="nav-link nav-action-link" href="{% url 'login' %}">Login</a>
+                <a class="nav-link nav-action-link" href="{% url 'register' %}">Register</a>
+            {% endif %}
+        </div>
     </nav>
-    <hr>
-    {% block content %}{% endblock %}
+    <main class="page-container">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+        <p>&copy; 2026 ReadLog. All rights reserved.</p>
+    </footer>
 </body>
 </html>

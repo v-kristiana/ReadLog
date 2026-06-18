@@ -3,80 +3,108 @@
 {% block title %}{{ book.title }}{% endblock %}
 
 {% block content %}
-    <a href="{% url 'books:book_list' %}">← Back to list</a>
-
-    <h1>{{ book.title }}</h1>
-    <p>Author: {{ book.author }}</p>
-    <p>Year: {{ book.year }}</p>
-    <p>ISBN: {{ book.isbn }}</p>
-
-    <p>Genres:
-        {% for genre in book.genres.all %}
-            {{ genre.name }}{% if not forloop.last %}, {% endif %}
-        {% endfor %}
-    </p>
-
-    <p>{{ book.description }}</p>
-
-    {% if book.image %}
-        <img src="{{ book.image.url }}" alt="{{ book.title }}" width="150">
-    {% endif %}
-
-    <p>Average rating: {{ book.average_rating }}/5</p>
-
-    {% if user.is_authenticated %}
-        <form method="post" action="{% url 'books:toggle_favourite' book.id %}">
-            {% csrf_token %}
-            <button type="submit">
-                {% if is_favourite %}Remove from Favourites{% else %}Add to Favourites{% endif %}
-            </button>
-        </form>
-
-        <form method="post" action="{% url 'books:set_reading_status' book.id %}">
-            {% csrf_token %}
-            <select name="status">
-                <option value="planned" {% if current_status == 'planned' %}selected{% endif %}>Planned</option>
-                <option value="reading" {% if current_status == 'reading' %}selected{% endif %}>Reading</option>
-                <option value="read" {% if current_status == 'read' %}selected{% endif %}>Read</option>
-            </select>
-            <button type="submit">Set Status</button>
-        </form>
-
-        {% if user.is_staff or user.role == 'admin' or user.role == 'worker' %}
-            <div style="margin-top: 1rem;">
-                <a href="{% url 'books:book_edit' book.id %}">Edit book</a> |
-                <a href="{% url 'books:book_delete' book.id %}">Delete book</a>
+    <div class="book-detail-page">
+        <div class="book-detail-header">
+            <div class="book-image">
+                {% if book.image %}
+                    <img src="{{ book.image.url }}" alt="{{ book.title }}">
+                {% else %}
+                    <div class="book-image-placeholder">No cover available</div>
+                {% endif %}
             </div>
-        {% endif %}
-    {% endif %}
+            <div class="book-meta">
+                <div>
+                    <h1>{{ book.title }}</h1>
+                    <p><strong>Author:</strong> {{ book.author }}</p>
+                    <p><strong>Year:</strong> {{ book.year }}</p>
+                    <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+                    <p class="book-genres"><strong>Genres:</strong>
+                        {% for genre in book.genres.all %}
+                            {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                </div>
+                <div class="book-description">
+                    <p>{{ book.description }}</p>
+                    <p><strong>Average rating:</strong> {{ book.average_rating }}/5</p>
+                </div>
+                {% if user.is_authenticated %}
+                    <div class="book-actions">
+                        <form method="post" action="{% url 'books:toggle_favourite' book.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="form-button">
+                                {% if is_favourite %}Remove from Favourites{% else %}Add to Favourites{% endif %}
+                            </button>
+                        </form>
 
-    <h2>Reviews</h2>
-    {% for review in reviews %}
-        <div>
-            <strong>{{ review.user }}</strong> — {{ review.rating }}/5
-            <p>{{ review.comment }}</p>
-            <small>{{ review.created_at }}</small>
-        </div>
-    {% empty %}
-        <p>No reviews yet.</p>
-    {% endfor %}
+                        <form method="post" action="{% url 'books:set_reading_status' book.id %}">
+                            {% csrf_token %}
+                            <select name="status">
+                                <option value="planned" {% if current_status == 'planned' %}selected{% endif %}>Planned</option>
+                                <option value="reading" {% if current_status == 'reading' %}selected{% endif %}>Reading</option>
+                                <option value="read" {% if current_status == 'read' %}selected{% endif %}>Read</option>
+                            </select>
+                            <button type="submit" class="form-button">Set Status</button>
+                        </form>
 
-    <h2>Recommended books</h2>
-    <div class="book-list">
-        {% for recommended_book in recommended_books %}
-            <div class="book-card">
-                <a href="{% url 'books:book_detail' recommended_book.id %}">
-                    {% if recommended_book.image %}
-                        <img src="{{ recommended_book.image.url }}" alt="{{ recommended_book.title }} cover" width="100" />
-                    {% endif %}
-                    <div>
-                        <strong>{{ recommended_book.title }}</strong><br>
-                        <span>{{ recommended_book.author }}</span>
+                        <div class="button-row">
+                            <a class="button-link" href="{% url 'reviews:add_review' book.id %}">Add review</a>
+                        </div>
+
+                        {% if user.is_staff or user.role == 'admin' or user.role == 'worker' %}
+                            <div class="button-row">
+                                <a class="button-link" href="{% url 'books:book_edit' book.id %}">Edit book</a>
+                                <a class="button-link" href="{% url 'books:book_delete' book.id %}">Delete book</a>
+                            </div>
+                        {% endif %}
                     </div>
-                </a>
+                {% endif %}
             </div>
-        {% empty %}
-            <p>No recommendations yet.</p>
-        {% endfor %}
+        </div>
+
+        <section class="review-section">
+            <h2>Reviews</h2>
+            <div class="review-list">
+                {% for review in reviews %}
+                    <div class="review-card">
+                        <strong>{{ review.user }}</strong>
+                        <p>{{ review.rating }}/5</p>
+                        <p>{{ review.comment }}</p>
+                        <small>{{ review.created_at }}</small>
+                        {% if user.is_authenticated %}
+                            {% if review.user == user or user.is_staff or user.role == 'admin' or user.role == 'worker' %}
+                                <form method="post" action="{% url 'reviews:delete_review' review.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="form-button">Delete review</button>
+                                </form>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p>No reviews yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="recommendations-section">
+            <h2>Recommended books</h2>
+            <div class="recommendation-grid">
+                {% for recommended_book in recommended_books %}
+                    <div class="recommendation-card">
+                        <a href="{% url 'books:book_detail' recommended_book.id %}" class="recommendation-link">
+                            {% if recommended_book.image %}
+                                <img src="{{ recommended_book.image.url }}" alt="{{ recommended_book.title }}" class="recommendation-image">
+                            {% else %}
+                                <div class="recommendation-empty">No cover</div>
+                            {% endif %}
+                            <strong class="recommendation-title">{{ recommended_book.title }}</strong>
+                            <span class="recommendation-author">{{ recommended_book.author }}</span>
+                        </a>
+                    </div>
+                {% empty %}
+                    <p>No recommendations yet.</p>
+                {% endfor %}
+            </div>
+        </section>
     </div>
 {% endblock %}

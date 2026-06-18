@@ -3,10 +3,10 @@
 {% block title %}Books{% endblock %}
 
 {% block content %}
-<div class="book-list">
+<div class="book-grid">
     {% for book in books %}
         <div class="book-card">
-            <a href="{% url 'books:book_detail' book.id %}">
+            <a class="book-card-link" href="{% url 'books:book_detail' book.id %}">
                 {% if book.image %}
                     <img src="{{ book.image.url }}" alt="{{ book.title }} cover" width="120" />
                 {% endif %}

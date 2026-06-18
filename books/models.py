@@ -44,9 +44,9 @@ class Favourite(models.Model):
 
 class ReadingStatus(models.Model):
     STATUS_CHOICES = [
-        ('planned', 'Plānots'),
-        ('reading', 'Lasu'),
-        ('read', 'Izlasīts'),
+        ('planned', 'Planned'),
+        ('reading', 'Reading'),
+        ('read', 'Read'),
     ]
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reading_statuses')
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='reading_statuses')

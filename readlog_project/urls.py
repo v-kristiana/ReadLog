@@ -27,6 +27,7 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/books/')),
     path('books/', include('books.urls')),
     path('accounts/', include('accounts.urls')),
+    path('reviews/', include('reviews.urls')),
     path('logout/', auth_views.LogoutView.as_view(next_page='/books/'), name='logout'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

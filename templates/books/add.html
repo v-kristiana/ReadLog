@@ -1,32 +1,34 @@
 {% extends 'base.html' %}
 {% block title %}Add Book{% endblock %}
 {% block content %}
-    <h1>Add Book</h1>
+    <div class="form-container">
+        <h1>Add Book</h1>
 
-    <form method="get" style="margin-bottom: 1rem;">
-        <input type="text" name="fetch" placeholder="Enter title or ISBN to auto-fill..." value="{{ request.GET.fetch }}">
-        <button type="submit">Fetch from Google Books</button>
-    </form>
+        <form method="get" class="fetch-form">
+            <input type="text" name="fetch" placeholder="Enter title or ISBN to auto-fill..." value="{{ request.GET.fetch }}">
+            <button type="submit" class="form-button">Fetch from Google Books</button>
+        </form>
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% if form.image_url.value %}
-            <div style="margin-bottom: 1rem;">
-                <strong>Cover preview:</strong><br>
-                <img src="{{ form.image_url.value }}" alt="Cover preview" style="max-width: 150px; max-height: 220px;">
-            </div>
+        <form method="post" enctype="multipart/form-data" class="book-form">
+            {% csrf_token %}
+            {% if form.image_url.value %}
+                <div class="cover-preview">
+                    <strong>Cover preview:</strong><br>
+                    <img src="{{ form.image_url.value }}" alt="Cover preview">
+                </div>
+            {% endif %}
+            {{ form.as_p }}
+            <button type="submit" class="form-button">Add Book</button>
+        </form>
+
+        {% if google_error %}
+            <p class="error-message">{{ google_error }}</p>
         {% endif %}
-        {{ form.as_p }}
-        <button type="submit">Add Book</button>
-    </form>
 
-    {% if google_error %}
-        <p style="color: red;">{{ google_error }}</p>
-    {% endif %}
+        {% if request.GET.fetch and not google_error %}
+            <p>Loaded data for <strong>{{ request.GET.fetch }}</strong>.</p>
+        {% endif %}
 
-    {% if request.GET.fetch and not google_error %}
-        <p>Loaded data for <strong>{{ request.GET.fetch }}</strong>.</p>
-    {% endif %}
-
-    <p><a href="{% url 'books:book_list' %}">Back to books</a></p>
+        <p><a href="{% url 'books:book_list' %}">Back to books</a></p>
+    </div>
 {% endblock %}

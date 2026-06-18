@@ -1,11 +1,9 @@
-from django.contrib import admin
-from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
+﻿from django.urls import path
+from . import views
+
+app_name = 'reviews'
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('books/', include('books.urls')),
-    path('accounts/', include('accounts.urls')),
-    path('reviews/', include('reviews.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('add/<int:book_id>/', views.add_review, name='add_review'),
+    path('<int:review_id>/delete/', views.delete_review, name='delete_review'),
+]

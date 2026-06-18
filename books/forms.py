@@ -18,6 +18,15 @@ class BookForm(forms.ModelForm):
         model = Book
         fields = ['title', 'author', 'description', 'year', 'isbn', 'image', 'image_url', 'genres']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['title'].widget.attrs.update({'placeholder': 'Book Title'})
+        self.fields['author'].widget.attrs.update({'placeholder': 'Author Name'})
+        self.fields['description'].widget.attrs.update({'placeholder': 'Book Description'})
+        self.fields['year'].widget.attrs.update({'placeholder': 'Publication Year'})
+        self.fields['isbn'].widget.attrs.update({'placeholder': 'ISBN'})
+        self.fields['image_url'].widget.attrs.update({'placeholder': 'Image URL (optional)'})
+
     def save(self, commit=True):
         book = super().save(commit=False)
         image_url = self.cleaned_data.get('image_url')
