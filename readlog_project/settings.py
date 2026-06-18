@@ -51,6 +51,10 @@ TEMPLATES = [
     },
 ]
 
+ALLOWED_HOSTS = ['readlog.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://readlog.up.railway.app']
+
+
 WSGI_APPLICATION = 'readlog_project.wsgi.application'
 
 AUTH_USER_MODEL = 'accounts.User'
