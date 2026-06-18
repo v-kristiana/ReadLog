@@ -394,7 +394,12 @@ select:focus {
     background: #fffafa;
 }
 
-label {
+input[type='text'] + label,
+input[type='password'] + label,
+input[type='email'] + label,
+input[type='number'] + label,
+textarea + label,
+select + label {
     display: none;
 }
 

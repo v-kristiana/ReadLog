@@ -27,7 +27,14 @@
                     <img src="{{ form.image_url.value }}" alt="Cover preview">
                 </div>
             {% endif %}
-            {{ form.as_p }}
+            <p>{{ form.title.label_tag }}<br>{{ form.title }}</p>
+            <p>{{ form.author.label_tag }}<br>{{ form.author }}</p>
+            <p>{{ form.description.label_tag }}<br>{{ form.description }}</p>
+            <p>{{ form.year.label_tag }}<br>{{ form.year }}</p>
+            <p>{{ form.isbn.label_tag }}<br>{{ form.isbn }}</p>
+            <p>{{ form.image.label_tag }}<br>{{ form.image }}</p>
+            <p>{{ form.image_url.label_tag }}<br>{{ form.image_url }}</p>
+            <p>{{ form.genres.label_tag }}<br>{{ form.genres }}</p>
             <button type="submit" class="form-button">{{ action }}</button>
         </form>
 

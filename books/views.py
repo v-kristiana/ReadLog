@@ -113,6 +113,8 @@ def _fetch_google_book_data(query):
 
         image_links = volume.get('imageLinks', {})
         image_url = image_links.get('thumbnail') or image_links.get('smallThumbnail', '')
+        categories = volume.get('categories', [])
+        genres = [category.strip() for category in categories if category and category.strip()]
 
         return {
             'title': title,
@@ -121,6 +123,7 @@ def _fetch_google_book_data(query):
             'year': year,
             'isbn': isbn,
             'image_url': image_url,
+            'genres': genres,
         }, None
     except Exception as exc:
         return None, f'Could not fetch from Google Books: {exc}'
@@ -137,6 +140,12 @@ def book_create(request):
 
     if fetch_query and request.method == 'GET':
         initial_data, google_error = _fetch_google_book_data(fetch_query)
+        if initial_data and initial_data.get('genres'):
+            genre_objects = []
+            for genre_name in initial_data.pop('genres'):
+                genre, _ = Genre.objects.get_or_create(name=genre_name)
+                genre_objects.append(genre)
+            initial_data['genres'] = genre_objects
 
     if request.method == 'POST':
         form = BookForm(request.POST, request.FILES)
