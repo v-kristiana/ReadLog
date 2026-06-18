@@ -6,10 +6,10 @@
 <body>
     <nav>
         <a href="{% url 'books:book_list' %}">Books</a>
-        <a href="{% url 'books:my_books' %}">My Books</a>
         {% if user.is_authenticated %}
+            <a href="{% url 'books:my_books' %}">My Books</a>
             {% if user.is_staff or user.role == 'admin' or user.role == 'worker' %}
-                <a href="{% url 'books:book_add' %}" style="margin-left: 1rem;">Add Book</a>
+                <a href="{% url 'books:book_add' %}">Add Book</a>
             {% endif %}
         {% endif %}
         <form action="{% url 'books:search_books' %}" method="get" style="display: inline; margin-left: 1rem;">

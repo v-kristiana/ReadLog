@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from .models import Book, ReadingStatus, Favourite, Genre
 from .forms import BookForm
-
+import requests
+from decouple import config
 
 
 @login_required
@@ -50,16 +51,75 @@ def book_create(request):
     if not user_can_manage_books(request.user):
         raise PermissionDenied
 
+    google_data = {}
+    google_error = None
+    fetch_query = request.GET.get('fetch', '').strip()
+
+    if fetch_query:
+        try:
+            api_key = config('GOOGLE_BOOKS_API_KEY', default=None)
+            if not api_key:
+                raise ValueError('Google Books API key is not configured.')
+
+            search_query = fetch_query
+            digits_only = fetch_query.replace('-', '')
+            if digits_only.isdigit() and len(digits_only) >= 10:
+                search_query = f'isbn:{fetch_query}'
+            else:
+                search_query = f'intitle:{fetch_query}'
+
+            response = requests.get(
+                'https://www.googleapis.com/books/v1/volumes',
+                params={'q': search_query, 'maxResults': 1, 'key': api_key},
+                timeout=10
+            )
+            data = response.json()
+            if response.status_code == 200:
+                items = data.get('items', [])
+                if items:
+                    info = items[0].get('volumeInfo', {})
+                    categories = info.get('categories', [])
+                    genre_ids = []
+                    genre_names = []
+                    for category in categories:
+                        genre, _ = Genre.objects.get_or_create(name=category)
+                        genre_ids.append(genre.id)
+                        genre_names.append(genre.name)
+
+                    image_url = info.get('imageLinks', {}).get('thumbnail') or info.get('imageLinks', {}).get('smallThumbnail', '')
+                    if image_url and image_url.startswith('http://'):
+                        image_url = image_url.replace('http://', 'https://', 1)
+
+                    google_data = {
+                        'title': info.get('title', ''),
+                        'author': ', '.join(info.get('authors', [])),
+                        'year': info.get('publishedDate', '')[:4],
+                        'isbn': next((i['identifier'] for i in info.get('industryIdentifiers', []) if i['type'] == 'ISBN_13'), ''),
+                        'description': info.get('description', ''),
+                        'image_url': image_url,
+                        'genres': genre_ids,
+                        'genre_names': genre_names,
+                    }
+                else:
+                    google_error = 'No books found for that query.'
+            else:
+                google_error = data.get('error', {}).get('message', f'API error {response.status_code}')
+        except Exception as e:
+            google_error = str(e)
+
     if request.method == 'POST':
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
             book = form.save()
             return redirect('books:book_detail', book_id=book.id)
     else:
-        form = BookForm()
+        form = BookForm(initial=google_data)
 
-    return render(request, 'books/add.html', {'form': form, 'action': 'Add Book'})
-
+    return render(request, 'books/add.html', {
+        'form': form,
+        'action': 'Add Book',
+        'google_error': google_error,
+    })
 
 @login_required
 def book_edit(request, book_id):

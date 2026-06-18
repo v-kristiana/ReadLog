@@ -41,6 +41,13 @@
             </select>
             <button type="submit">Set Status</button>
         </form>
+
+        {% if user.is_staff or user.role == 'admin' or user.role == 'worker' %}
+            <div style="margin-top: 1rem;">
+                <a href="{% url 'books:book_edit' book.id %}">Edit book</a> |
+                <a href="{% url 'books:book_delete' book.id %}">Delete book</a>
+            </div>
+        {% endif %}
     {% endif %}
 
     <h2>Reviews</h2>
