@@ -5,11 +5,32 @@
 {% block content %}
     <div class="form-container">
         <h1>{{ action }}</h1>
+
+        <form method="get" class="fetch-form">
+            <input type="text" name="fetch" placeholder="Enter title or ISBN to auto-fill..." value="{{ fetch_query }}">
+            <button type="submit" class="form-button">Fetch from Google Books</button>
+        </form>
+
+        {% if google_error %}
+            <p class="error-message">{{ google_error }}</p>
+        {% endif %}
+
+        {% if fetch_query and not google_error %}
+            <p>Loaded data for <strong>{{ fetch_query }}</strong>.</p>
+        {% endif %}
+
         <form method="post" enctype="multipart/form-data" class="book-form">
             {% csrf_token %}
+            {% if form.image_url.value %}
+                <div class="cover-preview">
+                    <strong>Cover preview:</strong><br>
+                    <img src="{{ form.image_url.value }}" alt="Cover preview">
+                </div>
+            {% endif %}
             {{ form.as_p }}
             <button type="submit" class="form-button">{{ action }}</button>
         </form>
+
         <p><a href="{% url 'books:book_list' %}">Back to books</a></p>
     </div>
 {% endblock %}

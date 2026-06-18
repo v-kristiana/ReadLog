@@ -54,7 +54,7 @@ TEMPLATES = [
     },
 ]
 
-ALLOWED_HOSTS = ['readlog.up.railway.app']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'readlog.up.railway.app']
 CSRF_TRUSTED_ORIGINS = ['https://readlog.up.railway.app']
 
 
@@ -80,6 +80,8 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
+
+GOOGLE_BOOKS_API_KEY = config('GOOGLE_BOOKS_API_KEY', default='')
 
 LANGUAGE_CODE = 'en'
 TIME_ZONE = 'Europe/Riga'

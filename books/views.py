@@ -2,6 +2,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.conf import settings
+import requests
+
 from .models import Book, ReadingStatus, Favourite, Genre
 from .forms import BookForm
 
@@ -78,20 +81,76 @@ def search_books(request):
     })
 
 
+def _fetch_google_book_data(query):
+    url = 'https://www.googleapis.com/books/v1/volumes'
+    params = {'q': query}
+    if settings.GOOGLE_BOOKS_API_KEY:
+        params['key'] = settings.GOOGLE_BOOKS_API_KEY
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        result = response.json()
+        items = result.get('items') or []
+        if not items:
+            return None, f'No Google Books results found for "{query}".'
+
+        volume = items[0].get('volumeInfo', {})
+        title = volume.get('title', '')
+        authors = volume.get('authors', [])
+        description = volume.get('description', '')
+        published_date = volume.get('publishedDate', '')
+        year = None
+        if published_date and len(published_date) >= 4 and published_date[:4].isdigit():
+            year = int(published_date[:4])
+
+        isbn = ''
+        for identifier in volume.get('industryIdentifiers', []):
+            if identifier.get('type') == 'ISBN_13':
+                isbn = identifier.get('identifier', '')
+                break
+        if not isbn and volume.get('industryIdentifiers'):
+            isbn = volume['industryIdentifiers'][0].get('identifier', '')
+
+        image_links = volume.get('imageLinks', {})
+        image_url = image_links.get('thumbnail') or image_links.get('smallThumbnail', '')
+
+        return {
+            'title': title,
+            'author': ', '.join(authors) if authors else '',
+            'description': description,
+            'year': year,
+            'isbn': isbn,
+            'image_url': image_url,
+        }, None
+    except Exception as exc:
+        return None, f'Could not fetch from Google Books: {exc}'
+
+
 @login_required
 def book_create(request):
     if not (request.user.is_staff or getattr(request.user, 'role', None) in ['admin', 'worker']):
         raise PermissionDenied
+
+    google_error = None
+    fetch_query = request.GET.get('fetch', '').strip()
+    initial_data = None
+
+    if fetch_query and request.method == 'GET':
+        initial_data, google_error = _fetch_google_book_data(fetch_query)
+
     if request.method == 'POST':
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
             book = form.save()
             return redirect('books:book_detail', book_id=book.id)
     else:
-        form = BookForm()
+        form = BookForm(initial=initial_data)
+
     return render(request, 'books/book_form.html', {
         'form': form,
         'action': 'Add Book',
+        'google_error': google_error,
+        'fetch_query': fetch_query,
     })
 
 
