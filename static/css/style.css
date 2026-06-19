@@ -72,7 +72,7 @@
 
 .nav-link:hover,
 .nav-action-link:hover {
-    background: #000000;
+    background: #fff9f9;
 }
 
 .nav-search-form {
@@ -117,7 +117,7 @@
     padding: 0.55rem 0.9rem;
     border: 1px solid transparent;
     border-radius: 0.55rem;
-    background: #000000;
+    background: #ffffff;
     color: #ffffff;
     cursor: pointer;
 }
